@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libbpf-dev clang llvm
+
+      - name: Check Wasm Tabix Crate
+        run: cargo check --target wasm32-unknown-unknown -p beacon-tabix-wasm
+
+      - name: Check Userspace and Common Crates
+        run: cargo check -p beacon-lsm-common -p beacon-net-common --features user
