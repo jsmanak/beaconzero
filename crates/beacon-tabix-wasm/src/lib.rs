@@ -1,7 +1,7 @@
 use std::io::{BufRead, Cursor, Read};
 use noodles_bgzf as bgzf;
 use noodles_core::{Position, Region};
-use noodles_csi::binning_index::{index::reference_sequence::bin::Chunk, BinningIndex};
+use noodles_csi::binning_index::BinningIndex;
 use noodles_tabix as tabix;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -54,22 +54,17 @@ impl TabixQueryEngine {
             QueryError::VcfParseError("Missing Tabix header".into())
         })?;
 
-        let reference_sequence_id = self
-            .index
-            .reference_sequence_names(header)
+        let reference_sequence_id = header
+            .reference_sequence_names()
             .get_index_of(chrom)
             .ok_or_else(|| QueryError::ChromosomeNotFound(chrom.to_string()))?;
 
-        let chunks: Vec<Chunk> = self
+        let chunks = self
             .index
             .query(reference_sequence_id, region.interval())
             .map_err(|e| QueryError::VcfParseError(e.to_string()))?;
 
-        if chunks.is_empty() {
-            return Err(QueryError::NoOverlappingChunks);
-        }
-
-        let first_chunk = &chunks[0];
+        let first_chunk = chunks.first().ok_or(QueryError::NoOverlappingChunks)?;
         let v_start = first_chunk.start();
         let v_end = first_chunk.end();
 
