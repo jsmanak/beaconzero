@@ -56,7 +56,7 @@ impl TabixQueryEngine {
 
         let reference_sequence_id = header
             .reference_sequence_names()
-            .get_index_of(chrom)
+            .get_index_of(chrom.as_bytes())
             .ok_or_else(|| QueryError::ChromosomeNotFound(chrom.to_string()))?;
 
         let chunks = self
