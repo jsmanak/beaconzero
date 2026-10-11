@@ -1,5 +1,7 @@
 # BeaconZero
 
+[![CI](https://github.com/jsmanak/beaconzero/actions/workflows/ci.yml/badge.svg)](https://github.com/jsmanak/beaconzero/actions/workflows/ci.yml)
+
 > **Kernel-Enforced, Zero-Trust Sovereign Genomic Query Gateway**
 
 BeaconZero implements the [GA4GH Beacon v2](https://beacon-project.io/) discovery API backed by Linux kernel security primitives. It restricts genomic file access strictly to authorized 64 KB compressed blocks using eBPF LSM hooks and intercepts unmasked sequence data exfiltration at Layer 3 using cgroup socket filters.
