@@ -56,7 +56,8 @@ impl TabixQueryEngine {
 
         let reference_sequence_id = header
             .reference_sequence_names()
-            .iter().position(|name| name.as_ref() == chrom.as_bytes()))
+            .iter()
+            .position(|name| name.as_slice() == chrom.as_bytes())
             .ok_or_else(|| QueryError::ChromosomeNotFound(chrom.to_string()))?;
 
         let chunks = self
@@ -94,7 +95,7 @@ impl TabixQueryEngine {
             if line.starts_with('#') || line.trim().is_empty() {
                 continue;
             }
-            let fields: Vec<&str> = line.split('\t').collect();
+            let fields: Vec<&str> = line.split('	').collect();
             if fields.len() < 8 {
                 continue;
             }
