@@ -57,7 +57,7 @@ impl TabixQueryEngine {
         let reference_sequence_id = header
             .reference_sequence_names()
             .iter()
-            .position(|name| name.as_slice() == chrom.as_bytes())
+            .position(|name| name.as_bytes() == chrom.as_bytes())
             .ok_or_else(|| QueryError::ChromosomeNotFound(chrom.to_string()))?;
 
         let chunks = self
@@ -69,13 +69,17 @@ impl TabixQueryEngine {
         let v_start = first_chunk.start();
         let v_end = first_chunk.end();
 
-        let file_offset_start = v_start.compressed();
-        let file_offset_end = v_end.compressed().max(file_offset_start + 65536);
+        let raw_start = u64::from(v_start);
+        let raw_end = u64::from(v_end);
+
+        // BGZF virtual offset: upper 48 bits store the compressed block byte offset
+        let file_offset_start = raw_start >> 16;
+        let file_offset_end = (raw_end >> 16).max(file_offset_start + 65536);
 
         Ok(HostFetchPlan {
             file_offset_start,
             file_offset_end,
-            virtual_offset_start: u64::from(v_start),
+            virtual_offset_start: raw_start,
         })
     }
 
