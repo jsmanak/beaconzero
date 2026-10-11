@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "crates/beacon-tabix-wasm",
+    "crates/beacon-lsm-common",
+    "crates/beacon-net-common",
+]
+resolver = "2"
