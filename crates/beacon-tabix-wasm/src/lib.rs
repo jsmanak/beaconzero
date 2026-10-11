@@ -57,7 +57,7 @@ impl TabixQueryEngine {
         let reference_sequence_id = header
             .reference_sequence_names()
             .iter()
-            .position(|name| name.as_bytes() == chrom.as_bytes())
+            .position(|name| AsRef::<[u8]>::as_ref(name) == chrom.as_bytes())
             .ok_or_else(|| QueryError::ChromosomeNotFound(chrom.to_string()))?;
 
         let chunks = self
@@ -72,7 +72,6 @@ impl TabixQueryEngine {
         let raw_start = u64::from(v_start);
         let raw_end = u64::from(v_end);
 
-        // BGZF virtual offset: upper 48 bits store the compressed block byte offset
         let file_offset_start = raw_start >> 16;
         let file_offset_end = (raw_end >> 16).max(file_offset_start + 65536);
 
@@ -88,7 +87,7 @@ impl TabixQueryEngine {
         bgzf_chunk_bytes: &[u8],
         target_pos: usize,
     ) -> Result<Option<VariantMatch>, QueryError> {
-        let mut decoder = bgzf::Reader::new(Cursor::new(bgzf_chunk_bytes));
+        let mut decoder = bgzf::io::Reader::new(Cursor::new(bgzf_chunk_bytes));
         let mut decompressed = Vec::new();
         decoder.read_to_end(&mut decompressed)?;
 
@@ -99,7 +98,7 @@ impl TabixQueryEngine {
             if line.starts_with('#') || line.trim().is_empty() {
                 continue;
             }
-            let fields: Vec<&str> = line.split('	').collect();
+            let fields: Vec<&str> = line.split('\t').collect();
             if fields.len() < 8 {
                 continue;
             }
