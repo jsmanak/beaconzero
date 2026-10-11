@@ -1,0 +1,12 @@
+[package]
+name = "beacon-lsm-ebpf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aya-ebpf = "0.1.1"
+beacon-lsm-common = { path = "../beacon-lsm-common" }
+
+[[bin]]
+name = "beacon-lsm-ebpf"
+path = "src/main.rs"

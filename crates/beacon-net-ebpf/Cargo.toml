@@ -1,0 +1,12 @@
+[package]
+name = "beacon-net-ebpf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aya-ebpf = "0.1.1"
+beacon-net-common = { path = "../beacon-net-common" }
+
+[[bin]]
+name = "beacon-net-ebpf"
+path = "src/main.rs"
